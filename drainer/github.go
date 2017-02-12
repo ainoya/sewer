@@ -3,16 +3,18 @@ package drainer
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 )
 
 type GitHubDrainer struct {
-	token    string
-	prNumber string
-	repoName string
-	client   *github.Client
+	token     string
+	prNumber  int
+	ownerName string
+	repoName  string
+	client    *github.Client
 }
 
 func NewGitHubDrainer() (*GitHubDrainer, error) {
@@ -21,10 +23,16 @@ func NewGitHubDrainer() (*GitHubDrainer, error) {
 		return nil, fmt.Errorf("environment variable GITHUB_TOKEN is not found")
 	}
 
-	prNumber := os.Getenv("CI_PULL_REQUEST")
+	prNumberStr := os.Getenv("CI_PULL_REQUEST")
 
-	if prNumber == "" {
+	if prNumberStr == "" {
 		return nil, fmt.Errorf("environment variable CI_PULL_REQUEST is not found")
+	}
+
+	prNumber, err := strconv.Atoi(prNumberStr)
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot convert environment variable CI_PULL_REQUEST: %s to int", prNumberStr)
 	}
 
 	u := os.Getenv("CIRCLE_PROJECT_USERNAME")
@@ -42,14 +50,29 @@ func NewGitHubDrainer() (*GitHubDrainer, error) {
 	client := github.NewClient(tc)
 
 	d := &GitHubDrainer{
-		token:    token,
-		prNumber: prNumber,
-		repoName: fmt.Sprintf("%s/%s", u, r),
-		client:   client,
+		token:     token,
+		prNumber:  prNumber,
+		ownerName: u,
+		repoName:  r,
+		client:    client,
 	}
 
 	return d, nil
 }
 
-func (d GitHubDrainer) Drain(message string) {
+func (d GitHubDrainer) Drain(message string) error {
+	_, _, err := d.client.Issues.CreateComment(
+		d.ownerName,
+		d.repoName,
+		d.prNumber,
+		&github.IssueComment{
+			Body: &message,
+		},
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -50,7 +50,12 @@ func main() {
 		}
 
 		f := flusher.NewFlusher(d, reader)
-		f.Flush()
+		err := f.Flush()
+
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 
 		return nil
 	}

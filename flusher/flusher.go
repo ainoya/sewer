@@ -22,7 +22,7 @@ func NewFlusher(
 	}
 }
 
-func (f Flusher) Flush() {
+func (f Flusher) Flush() error {
 	message := ""
 	for {
 		input, err := f.reader.ReadString('\n')
@@ -31,6 +31,7 @@ func (f Flusher) Flush() {
 		}
 
 		fmt.Printf("%s", input)
+		message += input + "\n"
 	}
-	f.drainer.Drain(message)
+	return f.drainer.Drain(message)
 }
