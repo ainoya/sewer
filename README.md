@@ -15,5 +15,5 @@ To posting your command STDOUT as a comment on your GitHub Pull Request:
 #export CIRCLE_PROJECT_USERNAME=ainoya
 #export CIRCLE_PROJECT_REPONAME=sewer
 
-echo 'hello, world' | sewer --github
+echo 'hello, world' | sewer --drain=github
 ```
