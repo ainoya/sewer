@@ -1,7 +1,7 @@
 # The container definition we want to use for developing our app
 box: golang:1.7
 build:
-  base-path: /go/src/github.com/recruit-mp/sewer
+  base-path: /go/src/github.com/ainoya/sewer
   steps:
     - script:
         name: setup tools
