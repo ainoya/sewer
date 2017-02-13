@@ -14,9 +14,9 @@ func main() {
 	app := cli.NewApp()
 
 	app.Flags = []cli.Flag{
-		cli.StringFlag{
+		cli.StringSliceFlag{
 			Name:  "drain",
-			Value: "github",
+			Value: &cli.StringSlice{},
 			Usage: "Destination where you want to notify piped messages",
 		},
 		cli.StringFlag{
@@ -25,8 +25,6 @@ func main() {
 			Usage: "Template format (STDIN is expanded as {{ .Message }} in the template)",
 		},
 	}
-
-	var d drainer.Drainer
 
 	app.Action = func(c *cli.Context) error {
 		info, _ := os.Stdin.Stat()
@@ -40,36 +38,50 @@ func main() {
 
 		reader := bufio.NewReader(os.Stdin)
 		tmpl := c.String("template")
-		fmt.Println(tmpl)
 
-		drain := c.String("drain")
-		var err error
-		if drain == "github" {
-			d, err = drainer.NewGitHubDrainer()
-			if err != nil {
-				fmt.Print(err)
-				return nil
-			}
-		} else if drain == "slack" {
-			d, err = drainer.NewSlackDrainer()
-			if err != nil {
-				fmt.Print(err)
-				return nil
-			}
-		} else {
+		drains := c.StringSlice("drain")
+		fmt.Printf("got drains %+v", drains)
+		drainers, err := newDrainers(drains)
+
+		if err != nil {
+			fmt.Println(err)
 			return nil
 		}
 
-		f := flusher.NewFlusher(d, reader, tmpl)
+		f := flusher.NewFlusher(drainers, reader, tmpl)
 		err = f.Flush()
 
 		if err != nil {
 			fmt.Println(err)
-			os.Exit(1)
 		}
 
 		return nil
 	}
 
 	app.Run(os.Args)
+}
+
+func newDrainers(drains []string) ([]drainer.Drainer, error) {
+	var drainers []drainer.Drainer
+	for _, drain := range drains {
+		var dnr drainer.Drainer
+		var err error
+		fmt.Printf("drain setting %s\n", drain)
+		switch drain {
+		case "github":
+			dnr, err = drainer.NewGitHubDrainer()
+		case "slack":
+			dnr, err = drainer.NewSlackDrainer()
+		default:
+			err = fmt.Errorf("drain type %s is not defined.", drain)
+		}
+		if err != nil {
+			return nil, err
+		}
+
+		drainers = append(drainers, dnr)
+	}
+
+	fmt.Printf("got drainers %+v\n", drainers)
+	return drainers, nil
 }

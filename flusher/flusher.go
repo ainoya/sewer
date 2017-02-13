@@ -11,7 +11,7 @@ import (
 )
 
 type Flusher struct {
-	drainer  drainer.Drainer
+	drainers []drainer.Drainer
 	reader   *bufio.Reader
 	template *template.Template
 }
@@ -21,7 +21,7 @@ type MsgOutput struct {
 }
 
 func NewFlusher(
-	drainer drainer.Drainer,
+	drainers []drainer.Drainer,
 	reader *bufio.Reader,
 	templateText string,
 ) *Flusher {
@@ -29,7 +29,7 @@ func NewFlusher(
 	tmpl := template.Must(template.New("messageTemplate").Parse(templateText))
 
 	return &Flusher{
-		drainer:  drainer,
+		drainers: drainers,
 		reader:   reader,
 		template: tmpl,
 	}
@@ -46,7 +46,14 @@ func (f Flusher) Flush() error {
 		fmt.Printf("%s", input)
 		message += input
 	}
+
 	var out bytes.Buffer
 	f.template.Execute(&out, MsgOutput{Message: message})
-	return f.drainer.Drain(out.String())
+	var outStr = out.String()
+
+	var err error
+	for _, dnr := range f.drainers {
+		err = dnr.Drain(outStr)
+	}
+	return err
 }
