@@ -31,9 +31,6 @@ func main() {
 			fmt.Println("Usage:")
 			fmt.Println("cat yourfile.txt | sewer --drain=github")
 			return nil
-		} else if info.Size() <= 0 {
-			fmt.Println("Pipe input is null")
-			return nil
 		}
 
 		reader := bufio.NewReader(os.Stdin)
