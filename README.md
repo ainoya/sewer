@@ -45,7 +45,7 @@ comment
 {{ .Message }}
 
 #Then your pipe input is expanded as {{ .Message }} variable,
-$ echo "hello, world" | go run main.go --drain=slack --template="$(cat test.tmpl)"
+$ echo "hello, world" | sewer --drain=slack --template="$(cat test.tmpl)"
 comment
 ---------
 
