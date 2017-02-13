@@ -42,9 +42,16 @@ func main() {
 		tmpl := c.String("template")
 		fmt.Println(tmpl)
 
-		if c.String("drain") == "github" {
-			var err error
+		drain := c.String("drain")
+		var err error
+		if drain == "github" {
 			d, err = drainer.NewGitHubDrainer()
+			if err != nil {
+				fmt.Print(err)
+				return nil
+			}
+		} else if drain == "slack" {
+			d, err = drainer.NewSlackDrainer()
 			if err != nil {
 				fmt.Print(err)
 				return nil
@@ -54,7 +61,7 @@ func main() {
 		}
 
 		f := flusher.NewFlusher(d, reader, tmpl)
-		err := f.Flush()
+		err = f.Flush()
 
 		if err != nil {
 			fmt.Println(err)

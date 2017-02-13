@@ -3,6 +3,12 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "gt4RQWXgDLvuta0zb4cYEBrwmkQ=",
+			"path": "github.com/bluele/slack",
+			"revision": "3b1fffcc45b37a2644a23eb7dc434d4d9f0987ba",
+			"revisionTime": "2017-01-26T01:05:58Z"
+		},
+		{
 			"checksumSHA1": "kBeNcaKk56FguvPSUCEaH6AxpRc=",
 			"path": "github.com/golang/protobuf/proto",
 			"revision": "8ee79997227bf9b34611aee7946ae64735e6fd93",
