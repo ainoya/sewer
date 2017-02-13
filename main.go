@@ -19,6 +19,11 @@ func main() {
 			Value: "github",
 			Usage: "Destination where you want to notify piped messages",
 		},
+		cli.StringFlag{
+			Name:  "template",
+			Value: "{{ .Message }}",
+			Usage: "Template format (STDIN is expanded as {{ .Message }} in the template)",
+		},
 	}
 
 	var d drainer.Drainer
@@ -34,6 +39,8 @@ func main() {
 		}
 
 		reader := bufio.NewReader(os.Stdin)
+		tmpl := c.String("template")
+		fmt.Println(tmpl)
 
 		if c.String("drain") == "github" {
 			var err error
@@ -46,7 +53,7 @@ func main() {
 			return nil
 		}
 
-		f := flusher.NewFlusher(d, reader)
+		f := flusher.NewFlusher(d, reader, tmpl)
 		err := f.Flush()
 
 		if err != nil {
