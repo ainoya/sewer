@@ -40,7 +40,6 @@ func main() {
 		tmpl := c.String("template")
 
 		drains := c.StringSlice("drain")
-		fmt.Printf("got drains %+v", drains)
 		drainers, err := newDrainers(drains)
 
 		if err != nil {
@@ -66,7 +65,6 @@ func newDrainers(drains []string) ([]drainer.Drainer, error) {
 	for _, drain := range drains {
 		var dnr drainer.Drainer
 		var err error
-		fmt.Printf("drain setting %s\n", drain)
 		switch drain {
 		case "github":
 			dnr, err = drainer.NewGitHubDrainer()
@@ -82,6 +80,5 @@ func newDrainers(drains []string) ([]drainer.Drainer, error) {
 		drainers = append(drainers, dnr)
 	}
 
-	fmt.Printf("got drainers %+v\n", drainers)
 	return drainers, nil
 }
