@@ -24,6 +24,11 @@ func main() {
 			Value: "{{ .Message }}",
 			Usage: "Template format (STDIN is expanded as {{ .Message }} in the template)",
 		},
+		cli.BoolFlag{
+			Name:   "eachlines",
+			Hidden: false,
+			Usage:  "If true, sewer sends message each lines.",
+		},
 	}
 
 	app.Action = func(c *cli.Context) error {
@@ -47,7 +52,9 @@ func main() {
 			return nil
 		}
 
-		f := flusher.NewFlusher(drainers, reader, tmpl)
+		eachlines := c.Bool("eachlines")
+
+		f := flusher.NewFlusher(drainers, reader, tmpl, eachlines)
 		err = f.Flush()
 
 		if err != nil {
