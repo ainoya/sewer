@@ -5,6 +5,8 @@ import (
 	"os"
 	"strconv"
 
+	"strings"
+
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 )
@@ -24,6 +26,13 @@ func NewGitHubDrainer() (*GitHubDrainer, error) {
 	}
 
 	prNumberStr := os.Getenv("CIRCLE_PR_NUMBER")
+
+	if prNumberStr == "" {
+		pullRequestURL := os.Getenv("CI_PULL_REQUEST")
+
+		xs := strings.Split(pullRequestURL, "/")
+		prNumberStr = xs[len(xs)-1]
+	}
 
 	if prNumberStr == "" {
 		return nil, fmt.Errorf("environment variable CIRCLE_PR_NUMBER is not found")
