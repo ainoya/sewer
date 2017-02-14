@@ -23,16 +23,16 @@ func NewGitHubDrainer() (*GitHubDrainer, error) {
 		return nil, fmt.Errorf("environment variable GITHUB_TOKEN is not found")
 	}
 
-	prNumberStr := os.Getenv("CI_PULL_REQUEST")
+	prNumberStr := os.Getenv("CIRCLE_PR_NUMBER")
 
 	if prNumberStr == "" {
-		return nil, fmt.Errorf("environment variable CI_PULL_REQUEST is not found")
+		return nil, fmt.Errorf("environment variable CIRCLE_PR_NUMBER is not found")
 	}
 
 	prNumber, err := strconv.Atoi(prNumberStr)
 
 	if err != nil {
-		return nil, fmt.Errorf("cannot convert environment variable CI_PULL_REQUEST: %s to int", prNumberStr)
+		return nil, fmt.Errorf("cannot convert environment variable CIRCLE_PR_NUMBER: %s to int", prNumberStr)
 	}
 
 	u := os.Getenv("CIRCLE_PROJECT_USERNAME")
