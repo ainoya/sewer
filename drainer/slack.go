@@ -38,7 +38,8 @@ func NewSlackDrainer() (*SlackDrainer, error) {
 
 func (d SlackDrainer) Drain(message string) error {
 	pl := &slack.WebHookPostPayload{
-		Text: message,
+		Channel: d.channel,
+		Text:    message,
 	}
 	if d.iconEmoji != "" {
 		pl.IconEmoji = d.iconEmoji
