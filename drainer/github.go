@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 
+	"context"
 	"strings"
 
 	"github.com/google/go-github/github"
@@ -70,7 +71,9 @@ func NewGitHubDrainer() (*GitHubDrainer, error) {
 }
 
 func (d GitHubDrainer) Drain(message string) error {
+	ctx := context.Background()
 	_, _, err := d.client.Issues.CreateComment(
+		ctx,
 		d.ownerName,
 		d.repoName,
 		d.prNumber,
